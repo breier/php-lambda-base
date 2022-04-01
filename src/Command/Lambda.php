@@ -13,7 +13,7 @@
 
 namespace App\Command;
 
-use App\Service\LambdaServer;
+use App\Service\LambdaService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -41,16 +41,16 @@ class Lambda extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $lambdaServer = new LambdaServer(getenv('AWS_LAMBDA_RUNTIME_API'));
+        $lambdaService = new LambdaService(getenv('AWS_LAMBDA_RUNTIME_API'));
 
-        $request = $lambdaServer->getNextRequest();
+        $request = $lambdaService->getNextRequest();
         if (empty($request['payload']) || empty($request['invocationId'])) {
             $output->writeln('ERROR: Gettin Next Request from AWS failed!');
             return self::FAILURE;
         }
 
-        $response = $lambdaServer->handle($request['payload']);
-        $lambdaServer->sendResponse($request['invocationId'], $response);
+        $response = $lambdaService->handle($request['payload']);
+        $lambdaService->sendResponse($request['invocationId'], $response);
 
         $output->writeln('Handled event successfully!');
 

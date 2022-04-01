@@ -3,9 +3,9 @@
 /**
  * PHP Version 8
  *
- * Lambda Server File
+ * Lambda Service File
  *
- * @category Server
+ * @category Service
  * @package  App\Service
  * @author   Andre Breier <breier.de@gmail.com>
  * @license  MIT /LICENSE
@@ -18,7 +18,7 @@ use Symfony\Component\HttpClient\HttpClient;
 /**
  * Lambda Command class
  */
-class LambdaServer
+class LambdaService
 {
     private const BASE_API_URI = '/2018-06-01/runtime/invocation';
 
