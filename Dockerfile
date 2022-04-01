@@ -7,9 +7,9 @@ ENV WEB_DOCUMENT_ROOT=/app \
     php.variables_order=EGPCS \
     php.short_open_tag=On
 
-COPY --chown=application:application ./hello-world /app
+COPY --chown=application:application . /app
 
-RUN su application -c '(cd /app && composer install --no-dev)'
+RUN su application -c '(cd /app && export PATH=$PATH:/usr/local/bin && composer install --no-dev)'
 
 WORKDIR /app
 
