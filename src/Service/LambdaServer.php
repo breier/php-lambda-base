@@ -22,9 +22,7 @@ class LambdaServer
 {
     private const BASE_API_URI = '/2018-06-01/runtime/invocation';
 
-    /**
-     * @var Symfony\Contracts\HttpClient\HttpClientInterface $httpClient
-     */
+    /** @var Symfony\Contracts\HttpClient\HttpClientInterface $httpClient */
     private $httpClient;
 
     /**
@@ -65,8 +63,12 @@ class LambdaServer
      */
     public function handle(array $payload): string
     {
-        // Just an echo, as example. (implement here)
+        // Just an echo, as example.
         $response = json_encode($payload);
+
+        /**
+         * Implement your function here !!
+         */
 
         return $response;
     }

@@ -41,37 +41,19 @@ class Lambda extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $output->writeln('Starting Event Monitor ...');
+        $lambdaServer = new LambdaServer(getenv('AWS_LAMBDA_RUNTIME_API'));
 
-        if (!getenv('AWS_LAMBDA_RUNTIME_API')) {
-            $output->writeln('!! AWS_LAMBDA_RUNTIME_API not found !!');
+        $request = $lambdaServer->getNextRequest();
+        if (empty($request['payload']) || empty($request['invocationId'])) {
+            $output->writeln('ERROR: Gettin Next Request from AWS failed!');
             return self::FAILURE;
         }
 
-        $lambdaServer = new LambdaServer(getenv('AWS_LAMBDA_RUNTIME_API'));
+        $response = $lambdaServer->handle($request['payload']);
+        $lambdaServer->sendResponse($request['invocationId'], $response);
 
-        while (true) {
-            // Ask the runtime API for a request to handle.
-            $request = $lambdaServer->getNextRequest();
+        $output->writeln('Handled event successfully!');
 
-            // Retry until timeout
-            if (empty($request['payload']) || empty($request['invocationId'])) {
-                $output->writeln('!! Invalid event request !!');
-                $output->writeln(json_encode($request, JSON_PRETTY_PRINT));
-
-                sleep(1);
-                continue;
-            }
-
-            // Execute the desired function and obtain the response.
-            $response = $lambdaServer->handle($request['payload']);
-
-            // Submit the response back to the runtime API.
-            $lambdaServer->sendResponse($request['invocationId'], $response);
-
-            $output->writeln('Handled one event successfully!');
-        }
-
-        return 0;
+        return self::SUCCESS;
     }
 }
