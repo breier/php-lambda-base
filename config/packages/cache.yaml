@@ -1,0 +1,6 @@
+framework:
+    cache:
+        # Use array cache, since lambda environment is read-only
+        app: cache.adapter.array
+        system: cache.adapter.array
+
