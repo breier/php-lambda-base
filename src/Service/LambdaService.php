@@ -34,31 +34,6 @@ class LambdaService
     }
 
     /**
-     * Get Next Request from AWS Lambda Event Pool
-     */
-    public function getNextRequest(): array
-    {
-        $response = $this->httpClient->request('GET', self::BASE_API_URI . '/next');
-
-        return [
-            'invocationId' => $response->getHeaders()['lambda-runtime-aws-request-id'][0],
-            'payload' => json_decode((string) $response->getContent(), true),
-        ];
-    }
-
-    /**
-     * Send Response back to AWS Lambda Event Pool
-     */
-    public function sendResponse(string $invocationId, string $response): void
-    {
-        $this->httpClient->request(
-            'POST',
-            self::BASE_API_URI . "/{$invocationId}/response",
-            ['body' => $response]
-        );
-    }
-
-    /**
      * Handle AWS Lambda Event
      */
     public function handle(array $payload): string
@@ -71,5 +46,30 @@ class LambdaService
          */
 
         return $response;
+    }
+
+    /**
+     * Get Next Request from AWS Lambda Event Pool
+     */
+    final public function getNextRequest(): array
+    {
+        $response = $this->httpClient->request('GET', self::BASE_API_URI . '/next');
+
+        return [
+            'invocationId' => $response->getHeaders()['lambda-runtime-aws-request-id'][0],
+            'payload' => json_decode((string) $response->getContent(), true),
+        ];
+    }
+
+    /**
+     * Send Response back to AWS Lambda Event Pool
+     */
+    final public function sendResponse(string $invocationId, string $response): void
+    {
+        $this->httpClient->request(
+            'POST',
+            self::BASE_API_URI . "/{$invocationId}/response",
+            ['body' => $response]
+        );
     }
 }
