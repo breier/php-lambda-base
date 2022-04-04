@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  lambda-api:
+    image: 'webdevops/php-nginx-dev:8.0-alpine'
+    ports: ['8090:80']
+    volumes: ['./:/app:Z']
+    working_dir: '/app'
+    environment:
+      WEB_DOCUMENT_ROOT: '/app/public'
+      XDEBUG_MODE: 'debug'
+      XDEBUG_START_WITH_REQUEST: 'yes'
+      XDEBUG_CLIENT_HOST: '172.17.0.1'
+      # XDEBUG_CLIENT_HOST: 'host.docker.internal'

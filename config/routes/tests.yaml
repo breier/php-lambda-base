@@ -1,0 +1,9 @@
+test-next:
+  path: /2018-06-01/runtime/invocation/next
+  controller: App\Tests\Controller\TestLambdaAPI::next
+  methods: GET
+
+test-response:
+  path: /2018-06-01/runtime/invocation/{invocationId}/response
+  controller: App\Tests\Controller\TestLambdaAPI::response
+  methods: POST

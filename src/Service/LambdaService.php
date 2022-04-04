@@ -8,7 +8,7 @@
  * @category Service
  * @package  App\Service
  * @author   Andre Breier <breier.de@gmail.com>
- * @license  MIT /LICENSE
+ * @license  GPLv3 https://www.gnu.org/licenses/gpl-3.0.en.html
  */
 
 namespace App\Service;

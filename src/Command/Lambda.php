@@ -8,7 +8,7 @@
  * @category Command
  * @package  App\Command
  * @author   Andre Breier <breier.de@gmail.com>
- * @license  MIT /LICENSE
+ * @license  GPLv3 https://www.gnu.org/licenses/gpl-3.0.en.html
  */
 
 namespace App\Command;
@@ -41,18 +41,35 @@ class Lambda extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $lambdaService = new LambdaService(getenv('AWS_LAMBDA_RUNTIME_API'));
-
-        $request = $lambdaService->getNextRequest();
-        if (empty($request['payload']) || empty($request['invocationId'])) {
-            $output->writeln('ERROR: Gettin Next Request from AWS failed!');
+        try {
+            $lambdaService = new LambdaService(getenv('AWS_LAMBDA_RUNTIME_API'));
+        } catch (\Exception $e) {
+            $output->writeln("ERROR: {$e->getMessage()}");
             return self::FAILURE;
         }
 
-        $response = $lambdaService->handle($request['payload']);
-        $lambdaService->sendResponse($request['invocationId'], $response);
+        try {
+            $successOnce = false;
 
-        $output->writeln('Handled event successfully!');
+            while (true) {
+                $request = $lambdaService->getNextRequest();
+
+                if (empty($request['payload']) || empty($request['invocationId'])) {
+                    throw new \Exception('Getting Next Request from AWS failed!');
+                }
+
+                $response = $lambdaService->handle($request['payload']);
+                $lambdaService->sendResponse($request['invocationId'], $response);
+
+                $output->writeln('Handled event successfully!');
+                $successOnce = true;
+            }
+        } catch (\Exception $e) {
+            if (!$successOnce) {
+                $output->writeln("ERROR: {$e->getMessage()}");
+                return self::FAILURE;
+            }
+        }
 
         return self::SUCCESS;
     }
