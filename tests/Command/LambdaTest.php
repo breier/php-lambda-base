@@ -23,17 +23,24 @@ use Symfony\Component\Console\Tester\CommandTester;
  */
 class LambdaTest extends KernelTestCase
 {
+    /** @var int $serverPid */
+    private $serverPid;
+
     /**
      * Make sure container is running before running tests
      */
     protected function setUp(): void
     {
         $baseDir = realpath(__DIR__ . '/../../');
-        exec("docker-compose -f {$baseDir}/docker-compose.yaml up -d");
+        $hostAddr = getenv('AWS_LAMBDA_RUNTIME_API');
+
+        $this->serverPid = shell_exec(
+            "php -S {$hostAddr} -t {$baseDir}/public > /dev/null 2>&1 & echo $!"
+        );
     }
 
     /**
-     * Tests main command of this aplication
+     * Tests main command of this application
      */
     public function testExecute(): void
     {
@@ -55,6 +62,8 @@ class LambdaTest extends KernelTestCase
      */
     protected function tearDown(): void
     {
+        shell_exec("kill {$this->serverPid}");
+
         foreach (glob(TestLambdaAPI::BASE_DIR_HASHES . '/*') as $tempHash) {
             unlink($tempHash);
         }
